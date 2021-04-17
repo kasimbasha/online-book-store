@@ -17,8 +17,12 @@ export class BookService {
 
   getBooks(theCatId : number):Observable<Book[]>{
     const searchURL = `${this.baseUrl}/search/categoryid?id=${theCatId}`
+    return this.getBookList(searchURL);
+  }
+
+  private getBookList(searchURL: string): Observable<Book[]> {
     return this.httpClient.get<GetResponseBooks>(searchURL).pipe(
-      map(data=>data._embedded.books)
+      map(data => data._embedded.books)
     );
   }
 
@@ -26,6 +30,11 @@ export class BookService {
     return this.httpClient.get<GetResponseBookCategory>(this.categoryUrl).pipe(
       map(data=>data._embedded.bookCategory)
     );
+  }
+
+  searchBooks(_key : string):Observable<Book[]>{
+    const searchURL = `${this.baseUrl}/search/searchbykeyword?name=${_key}`
+    return this.getBookList(searchURL);
   }
 }
 

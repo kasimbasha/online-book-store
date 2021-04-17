@@ -12,6 +12,7 @@ import {Book} from '../../common/book';
 export class BookListComponent implements OnInit {
   books:Book [];
   currCatId : number;
+  isSearchMode : boolean;
   constructor(private bService : BookService, 
               private _aRoute : ActivatedRoute) { }
 
@@ -23,6 +24,16 @@ export class BookListComponent implements OnInit {
   }
 
   listBooks(){
+    this.isSearchMode = this._aRoute.snapshot.paramMap.has('keyword');
+    if(this.isSearchMode){
+      this.searchModeList()
+    }
+    else {
+      this.defaultBooKList()
+    }
+  }
+
+  defaultBooKList(){
     const hasCategoryId : boolean =this._aRoute.snapshot.paramMap.has('id')
     if(hasCategoryId){
       this.currCatId = +this._aRoute.snapshot.params['id']
@@ -34,4 +45,14 @@ export class BookListComponent implements OnInit {
       data=> this.books = data
     )
   }
+
+  searchModeList(){
+    const keywrd:string = this._aRoute.snapshot.params['keyword']
+    return this.bService.searchBooks(keywrd).subscribe(
+      data=>this.books = data
+    )
+  }
+
+
+
 }
