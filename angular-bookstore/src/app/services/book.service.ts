@@ -12,8 +12,9 @@ export class BookService {
   private baseUrl="http://localhost:8080/api/v1/books";
   constructor(private httpClient : HttpClient) { }
 
-  getBooks():Observable<Book[]>{
-    return this.httpClient.get<GetResponseBooks>(this.baseUrl).pipe(
+  getBooks(theCatId : number):Observable<Book[]>{
+    const searchURL = `${this.baseUrl}/search/categoryid?id=${theCatId}`
+    return this.httpClient.get<GetResponseBooks>(searchURL).pipe(
       map(data=>data._embedded.books)
     );
   }
