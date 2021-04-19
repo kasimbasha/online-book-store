@@ -15,9 +15,9 @@ export class BookService {
 
   constructor(private httpClient : HttpClient) { }
 
-  getBooks(theCatId : number):Observable<Book[]>{
-    const searchURL = `${this.baseUrl}/search/categoryid?id=${theCatId}`
-    return this.getBookList(searchURL);
+  getBooks(theCatId : number,cpage:number,psize:number):Observable<GetResponseBooks>{
+    const searchURL = `${this.baseUrl}/search/categoryid?id=${theCatId}&page=${cpage}&size=${psize}`
+    return this.httpClient.get<GetResponseBooks>(searchURL);   
   }
 
   private getBookList(searchURL: string): Observable<Book[]> {
@@ -32,15 +32,26 @@ export class BookService {
     );
   }
 
-  searchBooks(_key : string):Observable<Book[]>{
-    const searchURL = `${this.baseUrl}/search/searchbykeyword?name=${_key}`
-    return this.getBookList(searchURL);
+  searchBooks(_key : string,cpage:number,psize:number):Observable<GetResponseBooks>{
+    const searchURL = `${this.baseUrl}/search/searchbykeyword?name=${_key}&page=${cpage}&size=${psize}`;
+    return this.httpClient.get<GetResponseBooks>(searchURL);   
   }
+
+  get(bookId: number): Observable<Book> {
+    return this.httpClient.get<Book>(`${this.baseUrl}/${bookId}`);
+  }
+
 }
 
 interface GetResponseBooks{
   _embedded:{
     books:Book[]
+  },
+  page : {
+    size : number,
+    totalElements : number,
+    totalPages : number,
+    number : number
   }
 }
 

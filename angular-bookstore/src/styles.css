@@ -14,3 +14,8 @@ h1 {
 body {
     padding-top: 56px;
   }
+
+
+  a, .pointer{
+    cursor: pointer;
+}

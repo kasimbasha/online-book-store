@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { NgbPaginationConfig } from '@ng-bootstrap/ng-bootstrap';
 import { BookService } from 'src/app/services/book.service';
-import {Book} from '../../common/book';
+import { Book } from '../../common/book';
 
 @Component({
   selector: 'app-book-list',
@@ -10,22 +11,32 @@ import {Book} from '../../common/book';
   styleUrls: ['./book-list.component.css']
 })
 export class BookListComponent implements OnInit {
-  books:Book [];
-  currCatId : number;
-  isSearchMode : boolean;
-  constructor(private bService : BookService, 
-              private _aRoute : ActivatedRoute) { }
+  books: Book[]=[];
+  currCatId: number=1;
+  privousCatId:number=1;
+  isSearchMode: boolean;
+  cPage : number =1
+  pageSize : number = 5
+  totalRecords : number = 0
+  //pageSize: number = 4;
+ // pageOfItems: Array<Book>;
+  constructor(private bService: BookService,
+    private _aRoute: ActivatedRoute, _config:NgbPaginationConfig) {
+      _config.maxSize=3;
+      _config.boundaryLinks = true;
+     }
 
   ngOnInit(): void {
-   this._aRoute.paramMap.subscribe(()=>{
+    console.log("This page size "+this.pageSize)
+    this._aRoute.paramMap.subscribe(() => {
       this.listBooks();
-      }
+    }
     )
   }
 
-  listBooks(){
+  listBooks() {
     this.isSearchMode = this._aRoute.snapshot.paramMap.has('keyword');
-    if(this.isSearchMode){
+    if (this.isSearchMode) {
       this.searchModeList()
     }
     else {
@@ -33,26 +44,47 @@ export class BookListComponent implements OnInit {
     }
   }
 
-  defaultBooKList(){
-    const hasCategoryId : boolean =this._aRoute.snapshot.paramMap.has('id')
-    if(hasCategoryId){
+ // onChangePage(pageOfItems: Array<Book>) {
+    // update current page of items
+  //  this.pageOfItems = pageOfItems;
+ // }
+  defaultBooKList() {
+    const hasCategoryId: boolean = this._aRoute.snapshot.paramMap.has('id')
+    if (hasCategoryId) {
       this.currCatId = +this._aRoute.snapshot.params['id']
     }
     else {
       this.currCatId = 1;
     }
-    this.bService.getBooks(this.currCatId).subscribe(
-      data=> this.books = data
+    // reset the page number to 1 if categiry changed
+    if(this.privousCatId!=this.currCatId)
+      this.cPage =1
+    this.privousCatId = this.currCatId;
+
+    this.bService.getBooks(this.currCatId,this.cPage-1,this.pageSize).subscribe(
+     this.processPaginate()
+    )
+  }
+  processPaginate() {
+    return data => {
+      this.books = data._embedded.books;
+      this.cPage = data.page.number+1;
+      this.pageSize = data.page.size;
+      this.totalRecords = data.page.totalElements;
+    }
+  }
+
+  searchModeList() {
+    const keywrd: string = this._aRoute.snapshot.params['keyword']
+    return this.bService.searchBooks(keywrd,this.cPage-1,this.pageSize).subscribe(
+      this.processPaginate()
     )
   }
 
-  searchModeList(){
-    const keywrd:string = this._aRoute.snapshot.params['keyword']
-    return this.bService.searchBooks(keywrd).subscribe(
-      data=>this.books = data
-    )
-  }
-
-
+updatePageSize(pageSize:number){ 
+  this.pageSize = pageSize;
+  this.cPage = 1;
+  this.listBooks()
+}
 
 }
