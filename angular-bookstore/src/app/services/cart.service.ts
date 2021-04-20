@@ -6,6 +6,7 @@ import { CartItem } from '../common/cart-item';
   providedIn: 'root'
 })
 export class CartService {
+
   cartItems:CartItem[]=[];
   totalPrice : Subject<number> = new Subject<number>();
   totalQty:Subject<number> = new Subject<number>();
@@ -23,14 +24,34 @@ export class CartService {
     if(isDuplicateItem)  cItem.quantity++;
     else this.cartItems.push(cartItem)
     // calcaulte price
-    let tPrice :number = 0;
-    let tQty:number = 0;
-    for(let curr_Item of this.cartItems){
+    this.calcTotalPrice();
+
+  }
+
+  calcTotalPrice() {
+    let tPrice: number = 0;
+    let tQty: number = 0;
+    for (let curr_Item of this.cartItems) {
       tPrice += curr_Item.unitPrice * curr_Item.quantity;
       tQty += curr_Item.quantity;
     }
-    this.totalPrice.next(tPrice)
-    this.totalQty.next(tQty)
+    this.totalPrice.next(tPrice);
+    this.totalQty.next(tQty);
+  }
 
+  decrementItem(cItem: CartItem) {
+    cItem.quantity--;
+    if(cItem.quantity === 0){
+      this.removeItem(cItem);
+    }else {
+      this.calcTotalPrice();
+    }
+  }
+  removeItem(cItem: CartItem) {
+    const itemIndex = this.cartItems.findIndex(e => e.id===cItem.id)
+    if(itemIndex !=-1){
+      this.cartItems.splice(itemIndex,1)
+      this.calcTotalPrice()
+    }
   }
 }

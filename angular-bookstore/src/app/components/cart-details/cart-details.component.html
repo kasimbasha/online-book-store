@@ -1,0 +1,66 @@
+<div class="row">
+    <div class="col-lg-3">
+      <app-book-category></app-book-category>
+    </div>
+    <!-- /.col-lg-3 -->  
+    <div class="col-lg-9">
+      <div class="row">
+         <div *ngIf="cartItems.length > 0"  class="col-md-12">
+              
+        <table class="table table-bordered">
+            <thead class="bg-dark text-light">
+                <th with="20%">Book Image</th>
+                <th with="50%">Book Name</th>  
+                <th with="30%"></th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let c of cartItems">
+                    <td>
+                        <img [src]="c.imageUrl" class="img-responsive" height="150px" width="200px">
+                    </td>
+                    <td>
+                        <p>{{c.name}}</p>
+                    <p>Price : {{c.unitPrice | currency:'INR'}}</p>
+                    </td>
+                    <td>
+                        <div class="row">
+                            <div class="col-md-12"><p>Quantity : 
+                                <span (click)="deleteItem(c)" class="float-right pointer text-danger">
+                                    <i class="fas fa-trash-alt"></i>
+                            </span> </p></div>
+                            <div class="col-md-4">
+                                <button (click)="increamentItem(c)" class="btn btn-primary btn-sm float-left">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <div class="col-md-4 text-center">{{c.quantity}}</div>
+                            <div class="col-md-4">
+                                <button (click)="decrementItem(c)" class="btn btn-primary btn-sm float-right">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                            <div class="col-md-12 mt-2"><p> Subtotal : {{(c.unitPrice * c.quantity)  | currency:'INR'}}</p></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"></td>
+                    <td class="font-weight-bold">
+                        <p>Quantity : {{totalQty}}</p>
+                        <p>Shipping : Free</p>
+                        <p>Total Price : {{totalPrice | currency: 'INR'}}</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+         </div>
+         <div *ngIf="cartItems.length==0" class="col-md-12  alert alert-warning mt-3">
+            Your cart is empty
+          </div>
+      </div>
+      <!-- /.row -->
+    </div>
+    <!-- /.col-lg-9 -->
+  
+  </div>
+  <!-- /.row -->
